@@ -19,18 +19,43 @@
   position: fixed; inset: 0; z-index: 9999;
   display: grid; place-items: center;
   background: radial-gradient(circle at 50% 42%, #1a1d27 0%, #0c0d10 60%);
-  animation: loaderOut .9s cubic-bezier(.16,.7,.18,1) 3.1s forwards;
+  animation: loaderOut .7s cubic-bezier(.16,.7,.18,1) 1.9s forwards;
 }
 .loader-logo {
-  width: min(300px, 60vw); height: auto;
+  position: relative;
+  width: min(300px, 60vw);
   opacity: 0; transform: scale(.92);
-  filter: grayscale(1) brightness(.55) contrast(.9);
-  animation:
-    logoIn 1s cubic-bezier(.16,.7,.18,1) forwards,
-    logoColor 1.6s cubic-bezier(.16,.7,.18,1) 1s forwards;
+  animation: logoIn .8s cubic-bezier(.16,.7,.18,1) forwards;
+}
+.loader-logo img {
+  display: block; width: 100%; height: auto;
+  filter: grayscale(1) brightness(.5) contrast(.9);
+  animation: logoColor 1.2s cubic-bezier(.16,.7,.18,1) .5s forwards;
+}
+/* balayage de lumière (masqué à la forme du logo) */
+.loader-glint {
+  position: absolute; inset: 0; pointer-events: none;
+  -webkit-mask: var(--logo) center / contain no-repeat;
+          mask: var(--logo) center / contain no-repeat;
+  background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.95) 50%, transparent 62%);
+  background-size: 260% 100%; background-position: 160% 0;
+  mix-blend-mode: screen;
+  animation: glint 1.6s cubic-bezier(.5,0,.3,1) .3s 2 forwards;
+}
+/* ligne de scan verticale facon lecture video */
+.loader-scan {
+  position: absolute; inset: 0; pointer-events: none;
+  -webkit-mask: var(--logo) center / contain no-repeat;
+          mask: var(--logo) center / contain no-repeat;
+  background: linear-gradient(180deg, transparent 44%, rgba(108,123,255,.85) 50%, transparent 56%);
+  background-size: 100% 240%; background-position: 0 -120%;
+  mix-blend-mode: screen; opacity: .9;
+  animation: scan 1.1s ease-in-out .4s forwards;
 }
 @keyframes logoIn { to { opacity: 1; transform: scale(1); } }
 @keyframes logoColor { to { filter: grayscale(0) brightness(1) contrast(1); } }
+@keyframes glint { to { background-position: -120% 0; } }
+@keyframes scan { to { background-position: 0 120%; } }
 @keyframes loaderOut { to { opacity: 0; visibility: hidden; } }
 
 html { scroll-behavior: smooth; }

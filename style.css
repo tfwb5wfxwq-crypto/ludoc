@@ -110,11 +110,16 @@ body {
 
 /* ============ PAGES PRODUITS ============ */
 .page-hero {
-  position: relative; z-index: 1;
-  min-height: 240px; display: flex; align-items: flex-end;
-  background-image: linear-gradient(180deg, rgba(12,13,16,.35), rgba(12,13,16,.92)), var(--banner);
-  background-size: cover; background-position: center;
+  position: relative; z-index: 1; overflow: hidden;
+  min-height: 300px; display: flex; align-items: flex-end;
   border-bottom: 1px solid var(--line);
+}
+.page-hero::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -12%; height: 124%;
+  background-image: linear-gradient(180deg, rgba(12,13,16,.3), rgba(12,13,16,.94)), var(--banner);
+  background-size: cover; background-position: center; z-index: -1;
+  transform: translate3d(0, calc(var(--p, 0) * 1px), 0) scale(1.05);
+  will-change: transform;
 }
 .page-hero-overlay { width: 100%; max-width: 1080px; margin: 0 auto; padding: 28px 20px 30px; }
 .back {
@@ -156,4 +161,44 @@ body {
 @media (max-width: 520px) {
   .prod-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
   .page-hero { min-height: 190px; }
+}
+
+/* ============ ANIMATIONS ============ */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px) scale(.985);
+  transition: opacity .8s cubic-bezier(.16,.7,.18,1), transform .8s cubic-bezier(.16,.7,.18,1);
+  transition-delay: var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.in { opacity: 1; transform: none; }
+
+/* Entrée hero (au chargement) */
+.page-hero-overlay > * { opacity: 0; transform: translateY(18px); animation: heroIn .9s cubic-bezier(.16,.7,.18,1) forwards; }
+.page-hero-overlay > *:nth-child(1) { animation-delay: .05s; }
+.page-hero-overlay > *:nth-child(2) { animation-delay: .15s; }
+.page-hero-overlay > *:nth-child(3) { animation-delay: .25s; }
+.site-header .brand, .site-header .tagline { opacity: 0; transform: translateY(14px); animation: heroIn .9s cubic-bezier(.16,.7,.18,1) forwards; }
+.site-header .tagline { animation-delay: .15s; }
+@keyframes heroIn { to { opacity: 1; transform: none; } }
+
+/* Orbes flottantes + réactives souris */
+.bg-orbs { transition: transform .6s ease-out; }
+.orb { animation: float 20s ease-in-out infinite; }
+.orb-2 { animation-duration: 26s; animation-delay: -6s; }
+.orb-3 { animation-duration: 32s; animation-delay: -12s; }
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  33%      { transform: translate(34px, -28px); }
+  66%      { transform: translate(-24px, 22px); }
+}
+
+/* Micro-interaction au clic sur les cartes */
+.card:active, .prod:active { transform: translateY(-2px) scale(.99); transition-duration: .1s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .page-hero-overlay > *, .site-header .brand, .site-header .tagline { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .orb { animation: none !important; }
+  .page-hero::before { transform: scale(1.05) !important; }
 }

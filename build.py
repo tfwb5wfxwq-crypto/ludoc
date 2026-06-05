@@ -98,6 +98,7 @@ TPL = '''<!DOCTYPE html>
     <p>© <span id="year"></span> Ludoc — Le Setup. Certains liens sont affiliés.</p>
   </footer>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="anim.js" defer></script>
 </body>
 </html>
 '''

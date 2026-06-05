@@ -49,30 +49,37 @@
 .ch-r { background: #ff0033; animation: chromaR 1.6s ease-out forwards; }
 .ch-b { background: #00ccff; animation: chromaB 1.6s ease-out forwards; }
 
-/* scanlines fixes */
+/* scanlines fixes (confinees a la forme du logo) */
 .vhs-lines {
-  position: absolute; inset: -40%; pointer-events: none;
+  position: absolute; inset: 0; pointer-events: none;
+  -webkit-mask: var(--logo) center / contain no-repeat;
+          mask: var(--logo) center / contain no-repeat;
   background: repeating-linear-gradient(
     to bottom,
     rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
-    rgba(0,0,0,.28) 3px, rgba(0,0,0,.28) 4px);
+    rgba(0,0,0,.32) 3px, rgba(0,0,0,.32) 4px);
   mix-blend-mode: multiply; opacity: .7;
 }
-/* grain video (turbulence SVG, defile en steps) */
+/* grain video (turbulence SVG) confine au logo, defile via background-position */
 .vhs-noise {
-  position: absolute; inset: -50%; pointer-events: none; opacity: .18;
+  position: absolute; inset: 0; pointer-events: none; opacity: .22;
+  -webkit-mask: var(--logo) center / contain no-repeat;
+          mask: var(--logo) center / contain no-repeat;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
   mix-blend-mode: screen;
   animation: vhsNoise .18s steps(4) infinite;
 }
-/* bande de tracking qui remonte */
+/* bande de tracking qui remonte (confinee au logo) */
 .vhs-track {
-  position: absolute; left: -40%; right: -40%; height: 26%; pointer-events: none;
-  top: 100%;
+  position: absolute; inset: 0; pointer-events: none;
+  -webkit-mask: var(--logo) center / contain no-repeat;
+          mask: var(--logo) center / contain no-repeat;
   background: linear-gradient(180deg,
-    transparent, rgba(255,255,255,.06) 30%, rgba(255,255,255,.18) 50%,
-    rgba(255,255,255,.06) 70%, transparent);
-  filter: blur(1px);
+    transparent 40%, rgba(255,255,255,.10) 46%, rgba(255,255,255,.28) 50%,
+    rgba(255,255,255,.10) 54%, transparent 60%);
+  background-size: 100% 300%; background-position: 0 150%;
+  mix-blend-mode: screen;
   animation: vhsTrack 1.9s linear infinite;
 }
 
@@ -100,13 +107,13 @@
 }
 @keyframes vhsFlicker { 0% { filter: brightness(1); } 100% { filter: brightness(1.06); } }
 @keyframes vhsNoise {
-  0% { transform: translate(0,0); }
-  25% { transform: translate(-6%, 3%); }
-  50% { transform: translate(4%, -5%); }
-  75% { transform: translate(-3%, 6%); }
-  100% { transform: translate(5%, 2%); }
+  0% { background-position: 0 0; }
+  25% { background-position: -40px 30px; }
+  50% { background-position: 30px -50px; }
+  75% { background-position: -20px 60px; }
+  100% { background-position: 50px 20px; }
 }
-@keyframes vhsTrack { from { top: 110%; } to { top: -30%; } }
+@keyframes vhsTrack { from { background-position: 0 150%; } to { background-position: 0 -150%; } }
 /* le signal se "verrouille" : gros split au depart, ca rentre */
 @keyframes chromaR {
   0% { transform: translate(-9px, 2px); opacity: .9; }

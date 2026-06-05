@@ -18,44 +18,108 @@
 #loader {
   position: fixed; inset: 0; z-index: 9999;
   display: grid; place-items: center;
-  background: radial-gradient(circle at 50% 42%, #1a1d27 0%, #0c0d10 60%);
-  animation: loaderOut .7s cubic-bezier(.16,.7,.18,1) 1.9s forwards;
+  background: #07080a;
+  overflow: hidden;
+  animation: loaderOut .55s ease 2.2s forwards, vhsFlicker .14s steps(2) infinite;
 }
-.loader-logo {
+/* vignette + courbure tube cathodique */
+#loader::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 120% at 50% 50%, transparent 58%, rgba(0,0,0,.85) 100%);
+}
+
+.vhs {
   position: relative;
-  width: min(300px, 60vw);
-  opacity: 0; transform: scale(.92);
-  animation: logoIn .8s cubic-bezier(.16,.7,.18,1) forwards;
+  width: min(320px, 64vw);
+  filter: saturate(1.4) contrast(1.1);
+  animation: vhsIn .5s ease forwards, vhsJitter .25s steps(3) infinite;
 }
-.loader-logo img {
+.vhs-logo { position: relative; }
+.vhs-logo img {
   display: block; width: 100%; height: auto;
-  filter: grayscale(1) brightness(.5) contrast(.9);
-  animation: logoColor 1.2s cubic-bezier(.16,.7,.18,1) .5s forwards;
+  filter: brightness(.95);
 }
-/* balayage de lumière (masqué à la forme du logo) */
-.loader-glint {
+/* fantomes RGB (aberration chromatique) masques a la forme du logo */
+.ch {
   position: absolute; inset: 0; pointer-events: none;
   -webkit-mask: var(--logo) center / contain no-repeat;
           mask: var(--logo) center / contain no-repeat;
-  background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.95) 50%, transparent 62%);
-  background-size: 260% 100%; background-position: 160% 0;
   mix-blend-mode: screen;
-  animation: glint 1.6s cubic-bezier(.5,0,.3,1) .3s 2 forwards;
 }
-/* ligne de scan verticale facon lecture video */
-.loader-scan {
-  position: absolute; inset: 0; pointer-events: none;
-  -webkit-mask: var(--logo) center / contain no-repeat;
-          mask: var(--logo) center / contain no-repeat;
-  background: linear-gradient(180deg, transparent 44%, rgba(108,123,255,.85) 50%, transparent 56%);
-  background-size: 100% 240%; background-position: 0 -120%;
-  mix-blend-mode: screen; opacity: .9;
-  animation: scan 1.1s ease-in-out .4s forwards;
+.ch-r { background: #ff0033; animation: chromaR 1.6s ease-out forwards; }
+.ch-b { background: #00ccff; animation: chromaB 1.6s ease-out forwards; }
+
+/* scanlines fixes */
+.vhs-lines {
+  position: absolute; inset: -40%; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+    rgba(0,0,0,.28) 3px, rgba(0,0,0,.28) 4px);
+  mix-blend-mode: multiply; opacity: .7;
 }
-@keyframes logoIn { to { opacity: 1; transform: scale(1); } }
-@keyframes logoColor { to { filter: grayscale(0) brightness(1) contrast(1); } }
-@keyframes glint { to { background-position: -120% 0; } }
-@keyframes scan { to { background-position: 0 120%; } }
+/* grain video (turbulence SVG, defile en steps) */
+.vhs-noise {
+  position: absolute; inset: -50%; pointer-events: none; opacity: .18;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: screen;
+  animation: vhsNoise .18s steps(4) infinite;
+}
+/* bande de tracking qui remonte */
+.vhs-track {
+  position: absolute; left: -40%; right: -40%; height: 26%; pointer-events: none;
+  top: 100%;
+  background: linear-gradient(180deg,
+    transparent, rgba(255,255,255,.06) 30%, rgba(255,255,255,.18) 50%,
+    rgba(255,255,255,.06) 70%, transparent);
+  filter: blur(1px);
+  animation: vhsTrack 1.9s linear infinite;
+}
+
+/* OSD type camescope */
+.vhs-osd {
+  position: absolute; pointer-events: none; z-index: 2;
+  font-family: "Courier New", monospace; font-weight: 700;
+  font-size: clamp(.8rem, 2.4vw, 1.05rem); letter-spacing: .12em;
+  color: #f4f5f7; text-shadow: 0 0 6px rgba(0,0,0,.9);
+  opacity: 0; animation: osdIn .4s ease .3s forwards;
+}
+.vhs-osd-tl { top: 26px; left: 26px; color: #ff4b4b; }
+.vhs-osd-tr { top: 26px; right: 26px; }
+.vhs-osd-br { bottom: 26px; right: 26px; }
+.rec { display: inline-flex; align-items: center; gap: 8px; }
+.rec i { width: 11px; height: 11px; border-radius: 50%; background: #ff2b2b;
+  box-shadow: 0 0 8px #ff2b2b; animation: recBlink 1s steps(2) infinite; }
+
+@keyframes vhsIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes vhsJitter {
+  0% { transform: translateX(0); }
+  33% { transform: translateX(-1px) skewX(.4deg); }
+  66% { transform: translateX(1.5px); }
+  100% { transform: translateX(0); }
+}
+@keyframes vhsFlicker { 0% { filter: brightness(1); } 100% { filter: brightness(1.06); } }
+@keyframes vhsNoise {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(-6%, 3%); }
+  50% { transform: translate(4%, -5%); }
+  75% { transform: translate(-3%, 6%); }
+  100% { transform: translate(5%, 2%); }
+}
+@keyframes vhsTrack { from { top: 110%; } to { top: -30%; } }
+/* le signal se "verrouille" : gros split au depart, ca rentre */
+@keyframes chromaR {
+  0% { transform: translate(-9px, 2px); opacity: .9; }
+  60% { transform: translate(-3px, 0); opacity: .55; }
+  100% { transform: translate(-1px, 0); opacity: .3; }
+}
+@keyframes chromaB {
+  0% { transform: translate(9px, -2px); opacity: .9; }
+  60% { transform: translate(3px, 0); opacity: .55; }
+  100% { transform: translate(1px, 0); opacity: .3; }
+}
+@keyframes osdIn { to { opacity: .92; } }
+@keyframes recBlink { 0% { opacity: 1; } 100% { opacity: .15; } }
 @keyframes loaderOut { to { opacity: 0; visibility: hidden; } }
 
 html { scroll-behavior: smooth; }
